@@ -1,0 +1,1907 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MCQ & Code Converter Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-background: #1a1a1a;
+            --text-color: #f0f0f0;
+            --input-text-color: #ffffff;
+            --rainbow-start: #ff0000;
+            --rainbow-middle1: #ff7f00;
+            --rainbow-middle2: #ffff00;
+            --rainbow-middle3: #00ff00;
+            --rainbow-middle4: #0000ff;
+            --rainbow-end: #4b0082;
+            --button-bg: linear-gradient(90deg, var(--rainbow-start), var(--rainbow-middle1), var(--rainbow-middle2), var(--rainbow-middle3), var(--rainbow-middle4), var(--rainbow-end));
+            --button-hover-bg: linear-gradient(90deg, var(--rainbow-end), var(--rainbow-middle4), var(--rainbow-middle3), var(--rainbow-middle2), var(--rainbow-middle1), var(--rainbow-start));
+            --card-background: #2a2a2a;
+            --border-color: #444;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --code-bg: #212121;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .welcome-screen {
+            background: radial-gradient(circle at top left, var(--rainbow-start) 0%, transparent 30%),
+                        radial-gradient(circle at bottom right, var(--rainbow-end) 0%, transparent 30%),
+                        var(--dark-background);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            animation: backgroundShift 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundShift {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 3rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px var(--shadow-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-title {
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 5px 15px var(--shadow-color);
+            background: var(--button-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowText 10s ease-in-out infinite;
+        }
+
+        @keyframes rainbowText {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .start-btn {
+            background: var(--button-bg);
+            color: var(--dark-background);
+            border: none;
+            padding: 1.2rem 4rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease-in-out;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            margin-top: 2rem;
+            background-size: 200% auto;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            background-position: right center;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        .shape-1 {
+            width: 350px;
+            height: 350px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 250px;
+            height: 250px;
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 2s;
+        }
+
+        .shape-3 {
+            width: 180px;
+            height: 180px;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            animation-delay: 4s;
+            opacity: 0.7;
+        }
+
+        .shape-4 {
+            width: 220px;
+            height: 220px;
+            top: 10%;
+            right: 15%;
+            animation-delay: 6s;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .main-content {
+            display: none;
+            padding: 4rem 0;
+        }
+
+        .main-container {
+            background: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .exit-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            padding: 0;
+            z-index: 10;
+        }
+
+        .exit-btn:hover {
+            color: var(--rainbow-start);
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .section-title {
+            color: var(--rainbow-middle3);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+            font-size: 2rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--rainbow-start), var(--rainbow-middle4));
+            border-radius: 3px;
+        }
+
+        .input-section {
+            background: var(--code-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-section-title {
+            font-weight: 600;
+            color: var(--rainbow-middle2);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .input-section-title i {
+            margin-right: 0.8rem;
+            color: var(--rainbow-middle1);
+            font-size: 1.5rem;
+        }
+
+        .form-control, .form-select {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--code-bg);
+            color: var(--input-text-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:not(:placeholder-shown),
+        textarea.form-control:not(:placeholder-shown) {
+            color: var(--input-text-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--rainbow-middle4);
+            box-shadow: 0 0 0 0.25rem rgba(75, 0, 130, 0.4);
+            background-color: #282828;
+        }
+
+        .form-control::placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        .form-control::-webkit-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        .form-control::-moz-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        .form-control:-ms-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        .form-control::ms-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+
+        textarea.form-control {
+            min-height: 180px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            background-color: var(--code-bg);
+            color: var(--input-text-color);
+        }
+
+        textarea.form-control::placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        textarea.form-control::-webkit-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        textarea.form-control::-moz-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        textarea.form-control:-ms-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        textarea.form-control::ms-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+
+        .btn-primary {
+            background: var(--button-bg);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: 700;
+            border-radius: 8px;
+            color: var(--dark-background);
+            transition: all 0.3s ease-in-out;
+            background-size: 200% auto;
+        }
+
+        .btn-primary:hover {
+            background-position: right center;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-outline-secondary {
+            border-radius: 8px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-group {
+            gap: 1.5rem;
+        }
+
+        .example-box {
+            background: #3a3a3a;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--rainbow-middle3);
+            color: #c0c0c0;
+            overflow-x: auto;
+        }
+
+        .question-box, .answer-box {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-top: 5px solid transparent;
+        }
+
+        .question-box {
+            border-image: linear-gradient(90deg, var(--rainbow-middle4), var(--rainbow-end));
+            border-image-slice: 1;
+        }
+
+        .answer-box {
+            border-image: linear-gradient(90deg, var(--rainbow-middle1), var(--rainbow-middle2));
+            border-image-slice: 1;
+        }
+
+        .box-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+
+        .box-title i {
+            margin-right: 0.6rem;
+            font-size: 1.3rem;
+            background: var(--button-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: rainbowText 5s linear infinite;
+        }
+
+        .form-check-label {
+            color: var(--text-color);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--rainbow-middle4);
+            border-color: var(--rainbow-middle4);
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(75, 0, 130, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 3rem;
+            }
+            
+            .welcome-content {
+                padding: 2rem;
+            }
+            
+            .start-btn {
+                padding: 1rem 3rem;
+                font-size: 1.1rem;
+            }
+
+            .main-container {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="welcome-screen" id="welcomeScreen">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="welcome-content">
+        <h1 class="welcome-title">MCQ & Code Converter</h1>
+        <p class="lead" style="color: rgba(255, 255, 255, 0.9);">Effortlessly transform your MCQs to Excel and Code to PDF!</p>
+        <button class="start-btn" id="startBtn">
+            <i class="fas fa-play me-2"></i> Start Tool
+        </button>
+    </div>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div class="container">
+        <div class="main-container">
+            <button class="exit-btn" id="exitBtn" title="Exit to start page">
+                <i class="fas fa-times-circle"></i>
+            </button>
+            
+            <h1 class="text-center mb-4">MCQ & Code Converter Tool</h1>
+            
+            <form id="mainForm">
+                <div class="mb-4">
+                    <label for="inputType" class="form-label section-title">Choose Input Type</label>
+                    <select class="form-select" id="inputType" required>
+                        <option value="mcq">Multiple Choice Questions (MCQ)</option>
+                        <option value="code">Code</option>
+                    </select>
+                </div>
+
+                <div id="mcqSection">
+                    <h3 class="section-title">MCQ Options</h3>
+                    
+                    <div class="input-section">
+                        <div class="input-section-title">
+                            <i class="fas fa-edit"></i> Input Method
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="manualEntry" name="mcqInputType" value="manual" checked>
+                            <label class="form-check-label" for="manualEntry">Manual Entry</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="fileUpload" name="mcqInputType" value="file">
+                            <label class="form-check-label" for="fileUpload">Upload File</label>
+                        </div>
+                    </div>
+                    
+                    <div id="manualEntrySection">
+                        <div class="question-box">
+                            <div class="box-title">
+                                <i class="fas fa-question-circle"></i> Column Titles
+                            </div>
+                            <input type="text" class="form-control" id="columnTitles" placeholder="Enter column titles separated by commas (e.g., Question, Option A, Option B, Option C, Option D, Answer)" required>
+                            <small class="text-muted">For multiple correct answers, separate with slashes (e.g., A/B or A/B/C)</small>
+                        </div>
+                        
+                        <div class="answer-box">
+                            <div class="box-title">
+                                <i class="fas fa-list-ol"></i> Questions & Answers
+                            </div>
+                            <textarea class="form-control" id="mcqText" rows="8" placeholder="Enter each question on a new line, with columns separated by '|'. Example:&#10;What is 2+2? | 3 | 4 | 5 | 6 | B&#10;Capital of France? | London | Paris | Berlin | Madrid | B" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="fileUploadSection" style="display:none;">
+                        <div class="input-section">
+                            <div class="box-title">
+                                <i class="fas fa-file-upload"></i> Upload MCQ File
+                            </div>
+                            <input type="file" class="form-control" id="mcqFile" accept=".txt">
+                            <small class="text-muted">Upload a .txt file with each question on a new line, columns separated by '|'. First line should contain column titles.</small>
+                            
+                            <div class="mt-3">
+                                <div class="box-title">
+                                    <i class="fas fa-info-circle"></i> Example Format
+                                </div>
+                                <div class="example-box">
+                                    Question,Option A,Option B,Option C,Option D,Answer<br>
+                                    What is 2+2? | 3 | 4 | 5 | 6 | B<br>
+                                    Capital of France? | London | Paris | Berlin | Madrid | B<br>
+                                    Multiple answers? | Option1 | Option2 | Option3 | Option4 | A/B
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="codeSection" style="display:none;">
+                    <h3 class="section-title">Code Options</h3>
+                    
+                    <div class="input-section">
+                        <div class="input-section-title">
+                            <i class="fas fa-edit"></i> Input Method
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="codeManualEntry" name="codeInputType" value="manual" checked>
+                            <label class="form-check-label" for="codeManualEntry">Manual Entry</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="codeFileUpload" name="codeInputType" value="file">
+                            <label class="form-check-label" for="codeFileUpload">Upload File</label>
+                        </div>
+                    </div>
+                    
+                    <div id="codeManualEntrySection">
+                        <div class="question-box">
+                            <div class="box-title">
+                                <i class="fas fa-code"></i> Language Selection
+                            </div>
+                            <select class="form-select" id="codeLanguage">
+                                <option value="cpp">C++ (Dev-C++)</option>
+                                <option value="java">Java</option>
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="answer-box">
+                            <div class="box-title">
+                                <i class="fas fa-file-code"></i> Your Code
+                            </div>
+                            <textarea class="form-control" id="codeText" rows="15" placeholder="Paste your code here..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="codeFileUploadSection" style="display:none;">
+                        <div class="question-box">
+                            <div class="box-title">
+                                <i class="fas fa-code"></i> Language Selection
+                            </div>
+                            <select class="form-select" id="codeLanguageUpload">
+                                <option value="cpp">C++ (Dev-C++)</option>
+                                <option value="java">Java</option>
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="answer-box">
+                            <div class="box-title">
+                                <i class="fas fa-file-upload"></i> Upload Code File
+                            </div>
+                            <input type="file" class="form-control" id="codeFile" accept=".cpp,.c,.h,.java,.py,.js,.txt">
+                            <small class="text-muted">Supported formats: .cpp, .c, .h (for C++), .java, .py, .js, .txt</small>
+                            
+                            <div class="mt-3">
+                                <div class="box-title">
+                                    <i class="fas fa-info-circle"></i> Example C++ Code
+                                </div>
+                                <div class="example-box">
+                                    #include &lt;iostream&gt;<br>
+                                    using namespace std;<br><br>
+                                    int main() {<br>
+                                    &nbsp;&nbsp;int num;<br>
+                                    &nbsp;&nbsp;cout &lt;&lt; "Enter a number: ";<br>
+                                    &nbsp;&nbsp;cin &gt;&gt; num;<br><br>
+                                    &nbsp;&nbsp;if(num % 2 == 0) {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;cout &lt;&lt; num &lt;&lt; " is even.";<br>
+                                    &nbsp;&nbsp;} else {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;cout &lt;&lt; num &lt;&lt; " is odd.";<br>
+                                    &nbsp;&nbsp;}<br><br>
+                                    &nbsp;&nbsp;return 0;<br>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center mt-4 btn-group">
+                    <button type="button" class="btn btn-outline-secondary" id="backBtn">
+                        <i class="fas fa-arrow-left me-2"></i> Back
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i> Download File
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+    // Welcome screen elements
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const mainContent = document.getElementById("mainContent");
+    const startBtn = document.getElementById("startBtn");
+    const backBtn = document.getElementById("backBtn");
+    const exitBtn = document.getElementById("exitBtn");
+
+    // Main form elements
+    const inputType = document.getElementById("inputType");
+    const mcqSection = document.getElementById("mcqSection");
+    const codeSection = document.getElementById("codeSection");
+    const mainForm = document.getElementById("mainForm");
+    const manualEntrySection = document.getElementById("manualEntrySection");
+    const fileUploadSection = document.getElementById("fileUploadSection");
+    const mcqFile = document.getElementById("mcqFile");
+    const codeFile = document.getElementById("codeFile");
+    
+    // Code section elements
+    const codeManualEntrySection = document.getElementById("codeManualEntrySection");
+    const codeFileUploadSection = document.getElementById("codeFileUploadSection");
+
+    // Start button click handler
+    startBtn.addEventListener("click", () => {
+        welcomeScreen.style.display = "none";
+        mainContent.style.display = "block";
+    });
+
+    // Back button click handler
+    backBtn.addEventListener("click", () => {
+        mainContent.style.display = "none";
+        welcomeScreen.style.display = "flex";
+    });
+
+    // Exit button click handler
+    exitBtn.addEventListener("click", () => {
+        if(confirm("Are you sure you want to exit? Any unsaved work will be lost.")) {
+            mainContent.style.display = "none";
+            welcomeScreen.style.display = "flex";
+            // Reset form
+            mainForm.reset();
+            // Reset any other state if needed (like input fields visibility)
+            document.getElementById("manualEntry").checked = true;
+            document.getElementById("codeManualEntry").checked = true;
+            manualEntrySection.style.display = 'block';
+            fileUploadSection.style.display = 'none';
+            codeManualEntrySection.style.display = 'block';
+            codeFileUploadSection.style.display = 'none';
+            inputType.value = "mcq"; // Set default to MCQ
+            inputType.dispatchEvent(new Event("change")); // Trigger change to show MCQ section
+        }
+    });
+
+    // Toggle between manual entry and file upload for MCQs
+    document.querySelectorAll('input[name="mcqInputType"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if(this.value === 'manual') {
+                manualEntrySection.style.display = 'block';
+                fileUploadSection.style.display = 'none';
+                document.getElementById("columnTitles").required = true;
+                document.getElementById("mcqText").required = true;
+                mcqFile.required = false;
+            } else {
+                manualEntrySection.style.display = 'none';
+                fileUploadSection.style.display = 'block';
+                document.getElementById("columnTitles").required = false;
+                document.getElementById("mcqText").required = false;
+                mcqFile.required = true;
+            }
+        });
+    });
+
+    // Toggle between manual entry and file upload for Code
+    document.querySelectorAll('input[name="codeInputType"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if(this.value === 'manual') {
+                codeManualEntrySection.style.display = 'block';
+                codeFileUploadSection.style.display = 'none';
+                document.getElementById("codeText").required = true;
+                codeFile.required = false;
+            } else {
+                codeManualEntrySection.style.display = 'none';
+                codeFileUploadSection.style.display = 'block';
+                document.getElementById("codeText").required = false;
+                codeFile.required = true;
+            }
+        });
+    });
+
+    // Toggle between MCQ and Code sections
+    inputType.addEventListener("change", () => {
+        if (inputType.value === "mcq") {
+            mcqSection.style.display = "block";
+            codeSection.style.display = "none";
+            // Set required attributes for MCQ section based on current radio selection
+            document.querySelector('input[name="mcqInputType"]:checked').dispatchEvent(new Event('change'));
+        } else {
+            mcqSection.style.display = "none";
+            codeSection.style.display = "block";
+            // Trigger change event for code input type to set required attributes
+            document.querySelector('input[name="codeInputType"]:checked').dispatchEvent(new Event('change'));
+        }
+    });
+
+    mainForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if(inputType.value === "mcq") {
+            let titles, mcqRaw;
+            
+            if(document.querySelector('input[name="mcqInputType"]:checked').value === 'manual') {
+                // Manual entry
+                titles = document.getElementById("columnTitles").value.trim();
+                mcqRaw = document.getElementById("mcqText").value.trim();
+            } else {
+                // File upload
+                if(!mcqFile.files.length) {
+                    alert("Please select a file to upload.");
+                    return;
+                }
+                
+                try {
+                    const fileContent = await readFileAsText(mcqFile.files[0]);
+                    const lines = fileContent.split('\n');
+                    if (lines.length === 0) {
+                        alert("The uploaded file is empty.");
+                        return;
+                    }
+                    titles = lines[0].trim();
+                    mcqRaw = lines.slice(1).join('\n').trim();
+                    if (!titles) {
+                        alert("The first line (column titles) in the file is empty.");
+                        return;
+                    }
+                } catch(error) {
+                    alert("Error reading file: " + error.message);
+                    return;
+                }
+            }
+
+            if(!titles || !mcqRaw) {
+                alert("Please provide MCQ data.");
+                return;
+            }
+
+            const columns = titles.split(",").map(t => t.trim());
+            const rows = mcqRaw.split("\n").map(line => line.split("|").map(cell => cell.trim()));
+
+            // Create sheet data
+            let sheetData = [columns];
+            rows.forEach(row => {
+                // Fill missing cells with empty string if row shorter than columns
+                while(row.length < columns.length) row.push("");
+                sheetData.push(row.slice(0, columns.length));
+            });
+
+            // Generate workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+            // Auto-size columns based on content
+            const colWidths = [];
+            sheetData.forEach(row => {
+                row.forEach((cell, colIndex) => {
+                    // Calculate width based on content length
+                    const width = cell.toString().length;
+                    if (!colWidths[colIndex] || width > colWidths[colIndex]) {
+                        colWidths[colIndex] = width;
+                    }
+                });
+            });
+
+            // Apply column widths (add some padding)
+            ws['!cols'] = colWidths.map(width => ({ 
+                wch: Math.min(Math.max(width + 2, 10), 50) // Min width 10, max width 50, add 2 chars padding
+            }));
+
+            XLSX.utils.book_append_sheet(wb, ws, "MCQs");
+
+            // Export to XLSX
+            XLSX.writeFile(wb, "mcq_output.xlsx");
+            alert("MCQ file downloaded successfully!");
+
+        } else if(inputType.value === "code") {
+            let codeText, language;
+            
+            if(document.querySelector('input[name="codeInputType"]:checked').value === 'manual') {
+                // Manual entry
+                codeText = document.getElementById("codeText").value.trim();
+                language = document.getElementById("codeLanguage").value;
+            } else {
+                // File upload
+                if(!codeFile.files.length) {
+                    alert("Please select a file to upload.");
+                    return;
+                }
+                
+                try {
+                    codeText = await readFileAsText(codeFile.files[0]);
+                    language = document.getElementById("codeLanguageUpload").value;
+                } catch(error) {
+                    alert("Error reading file: " + error.message);
+                    return;
+                }
+            }
+            
+            if(!codeText) {
+                alert("Please enter or upload the code.");
+                return;
+            }
+
+            // Use jsPDF to create PDF and download
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                unit: "pt",
+                format: "a4"
+            });
+
+            const margin = 40;
+            const maxLineWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+            const fontSize = 10;
+            const lineHeight = 1.2; // Adjust for spacing between lines
+
+            doc.setFont("Space Mono", "normal"); // Use Space Mono for code
+            doc.setFontSize(fontSize);
+            doc.setTextColor("#000000"); // Changed from light grey to black
+
+            // Add language info at the top
+            const languageText = language === "cpp" ? "C++ (Dev-C++)" : 
+                                 language === "java" ? "Java" :
+                                 language === "python" ? "Python" :
+                                 language === "javascript" ? "JavaScript" : "Other";
+            
+            doc.setFontSize(12); // Slightly larger for language
+            doc.setTextColor("#000000"); // Changed from cyan to black
+            doc.text(`Language: ${languageText}`, margin, margin - 15);
+            doc.setFontSize(fontSize); // Reset to code font size
+            doc.setTextColor("#000000"); // Changed from light grey to black
+
+            // Split code by lines and add with word-wrap
+            let y = margin;
+            const lines = codeText.split('\n');
+
+            lines.forEach(line => {
+                const wrappedLines = doc.splitTextToSize(line, maxLineWidth);
+                wrappedLines.forEach(wrappedLine => {
+                    // Simple syntax highlighting (example for keywords)
+                    const keywords = ['int', 'void', 'cout', 'cin', 'if', 'else', 'for', 'while', 'class', 'public', 'private', 'static', 'return', 'import', 'function', 'const', 'let', 'var', 'def', 'print', 'System.out.println', 'console.log', '#include', 'using', 'namespace'];
+                    
+                    let xOffset = margin;
+                    let currentLine = wrappedLine;
+
+                    keywords.forEach(keyword => {
+                        const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
+                        currentLine = currentLine.replace(regex, `¤¤¤${keyword}¤¤¤`); // Use unique delimiter
+                    });
+
+                    const parts = currentLine.split('¤¤¤');
+
+                    parts.forEach(part => {
+                        if (keywords.includes(part)) {
+                            doc.setTextColor("#FFD700"); // Gold for keywords (consider changing for better contrast on white background)
+                            doc.text(part, xOffset, y);
+                            doc.setTextColor("#000000"); // Reset to black after keyword
+                        } else {
+                            doc.text(part, xOffset, y);
+                        }
+                        xOffset += doc.getStringUnitWidth(part) * fontSize;
+                    });
+                    
+                    y += fontSize * lineHeight;
+                    if (y > doc.internal.pageSize.getHeight() - margin) {
+                        doc.addPage();
+                        y = margin;
+                        doc.setFont("Space Mono", "normal");
+                        doc.setFontSize(fontSize);
+                        doc.setTextColor("#000000"); // Changed from light grey to black
+                    }
+                });
+            });
+            
+            // Determine filename based on language
+            let filename = "code_output";
+            if(language === "cpp") filename = "program.cpp";
+            else if(language === "java") filename = "Program.java";
+            else if(language === "python") filename = "script.py";
+            else if(language === "javascript") filename = "script.js";
+            
+            doc.save(`${filename}.pdf`);
+            alert("Code PDF downloaded successfully!");
+        }
+    });
+
+    // Helper function to read file as text
+    function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = event => resolve(event.target.result);
+            reader.onerror = error => reject(error);
+            reader.readAsText(file);
+        });
+    }
+
+    // Trigger change event on page load to set correct section visible
+    inputType.dispatchEvent(new Event("change"));
+</script>
+
+</body>
+</html>
+
+Sources
+
+
+
+
+give full code
+
+
+
+Show thinking
+I've provided the complete HTML code for your MCQ & Code Converter Tool. The key changes are in the JavaScript section, specifically within the else if(inputType.value === "code") block, where the doc.setTextColor() calls have been updated to use #000000 (black) for the text, ensuring a darker output in the generated PDF.
+MCQ & Code Converter Tool
+23 May, 11:38
+
+Open
+
+ Try again without Canvas 
+
+You can copy and paste this code into your Final project.html file.
+
+Let me know if you have any other questions or need further modifications!
+
+
+Sources
+
+
+
+
+
+
+
+
+
+Canvas
+
+Deep Research
+
+Gemini can make mistakes, so double-check it
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MCQ & Code Converter Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-background: #1a1a1a;
+            --text-color: #f0f0f0;
+            --input-text-color: #ffffff;
+            --rainbow-start: #ff0000;
+            --rainbow-middle1: #ff7f00;
+            --rainbow-middle2: #ffff00;
+            --rainbow-middle3: #00ff00;
+            --rainbow-middle4: #0000ff;
+            --rainbow-end: #4b0082;
+            --button-bg: linear-gradient(90deg, var(--rainbow-start), var(--rainbow-middle1), var(--rainbow-middle2), var(--rainbow-middle3), var(--rainbow-middle4), var(--rainbow-end));
+            --button-hover-bg: linear-gradient(90deg, var(--rainbow-end), var(--rainbow-middle4), var(--rainbow-middle3), var(--rainbow-middle2), var(--rainbow-middle1), var(--rainbow-start));
+            --card-background: #2a2a2a;
+            --border-color: #444;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --code-bg: #212121;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .welcome-screen {
+            background: radial-gradient(circle at top left, var(--rainbow-start) 0%, transparent 30%),
+                        radial-gradient(circle at bottom right, var(--rainbow-end) 0%, transparent 30%),
+                        var(--dark-background);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            animation: backgroundShift 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundShift {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 3rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px var(--shadow-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-title {
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 5px 15px var(--shadow-color);
+            background: var(--button-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowText 10s ease-in-out infinite;
+        }
+
+        @keyframes rainbowText {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .start-btn {
+            background: var(--button-bg);
+            color: var(--dark-background);
+            border: none;
+            padding: 1.2rem 4rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease-in-out;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            margin-top: 2rem;
+            background-size: 200% auto;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            background-position: right center;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        .shape-1 {
+            width: 350px;
+            height: 350px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 250px;
+            height: 250px;
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 2s;
+        }
+
+        .shape-3 {
+            width: 180px;
+            height: 180px;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            animation-delay: 4s;
+            opacity: 0.7;
+        }
+
+        .shape-4 {
+            width: 220px;
+            height: 220px;
+            top: 10%;
+            right: 15%;
+            animation-delay: 6s;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .main-content {
+            display: none;
+            padding: 4rem 0;
+        }
+
+        .main-container {
+            background: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .exit-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            padding: 0;
+            z-index: 10;
+        }
+
+        .exit-btn:hover {
+            color: var(--rainbow-start);
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .section-title {
+            color: var(--rainbow-middle3);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+            font-size: 2rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--rainbow-start), var(--rainbow-middle4));
+            border-radius: 3px;
+        }
+
+        .input-section {
+            background: var(--code-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-section-title {
+            font-weight: 600;
+            color: var(--rainbow-middle2);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .input-section-title i {
+            margin-right: 0.8rem;
+            color: var(--rainbow-middle1);
+            font-size: 1.5rem;
+        }
+
+        .form-control, .form-select {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--code-bg);
+            color: var(--input-text-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:not(:placeholder-shown),
+        textarea.form-control:not(:placeholder-shown) {
+            color: var(--input-text-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--rainbow-middle4);
+            box-shadow: 0 0 0 0.25rem rgba(75, 0, 130, 0.4);
+            background-color: #282828;
+        }
+
+        .form-control::placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        .form-control::-webkit-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        .form-control::-moz-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        .form-control:-ms-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        .form-control::ms-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+
+        textarea.form-control {
+            min-height: 180px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            background-color: var(--code-bg);
+            color: var(--input-text-color);
+        }
+
+        textarea.form-control::placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        textarea.form-control::-webkit-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        textarea.form-control::-moz-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        textarea.form-control:-ms-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+        textarea.form-control::ms-input-placeholder {
+            color: var(--input-text-color);
+            opacity: 0.7;
+        }
+
+        .btn-primary {
+            background: var(--button-bg);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: 700;
+            border-radius: 8px;
+            color: var(--dark-background);
+            transition: all 0.3s ease-in-out;
+            background-size: 200% auto;
+        }
+
+        .btn-primary:hover {
+            background-position: right center;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-outline-secondary {
+            border-radius: 8px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-group {
+            gap: 1.5rem;
+        }
+
+        .example-box {
+            background: #3a3a3a;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--rainbow-middle3);
+            color: #c0c0c0;
+            overflow-x: auto;
+        }
+
+        .question-box, .answer-box {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-top: 5px solid transparent;
+        }
+
+        .question-box {
+            border-image: linear-gradient(90deg, var(--rainbow-middle4), var(--rainbow-end));
+            border-image-slice: 1;
+        }
+
+        .answer-box {
+            border-image: linear-gradient(90deg, var(--rainbow-middle1), var(--rainbow-middle2));
+            border-image-slice: 1;
+        }
+
+        .box-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+
+        .box-title i {
+            margin-right: 0.6rem;
+            font-size: 1.3rem;
+            background: var(--button-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: rainbowText 5s linear infinite;
+        }
+
+        .form-check-label {
+            color: var(--text-color);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--rainbow-middle4);
+            border-color: var(--rainbow-middle4);
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(75, 0, 130, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 3rem;
+            }
+            
+            .welcome-content {
+                padding: 2rem;
+            }
+            
+            .start-btn {
+                padding: 1rem 3rem;
+                font-size: 1.1rem;
+            }
+
+            .main-container {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="welcome-screen" id="welcomeScreen">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="welcome-content">
+        <h1 class="welcome-title">MCQ & Code Converter</h1>
+        <p class="lead" style="color: rgba(255, 255, 255, 0.9);">Effortlessly transform your MCQs to Excel and Code to PDF!</p>
+        <button class="start-btn" id="startBtn">
+            <i class="fas fa-play me-2"></i> Start Tool
+        </button>
+    </div>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div class="container">
+        <div class="main-container">
+            <button class="exit-btn" id="exitBtn" title="Exit to start page">
+                <i class="fas fa-times-circle"></i>
+            </button>
+            
+            <h1 class="text-center mb-4">MCQ & Code Converter Tool</h1>
+            
+            <form id="mainForm">
+                <div class="mb-4">
+                    <label for="inputType" class="form-label section-title">Choose Input Type</label>
+                    <select class="form-select" id="inputType" required>
+                        <option value="mcq">Multiple Choice Questions (MCQ)</option>
+                        <option value="code">Code</option>
+                    </select>
+                </div>
+
+                <div id="mcqSection">
+                    <h3 class="section-title">MCQ Options</h3>
+                    
+                    <div class="input-section">
+                        <div class="input-section-title">
+                            <i class="fas fa-edit"></i> Input Method
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="manualEntry" name="mcqInputType" value="manual" checked>
+                            <label class="form-check-label" for="manualEntry">Manual Entry</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="fileUpload" name="mcqInputType" value="file">
+                            <label class="form-check-label" for="fileUpload">Upload File</label>
+                        </div>
+                    </div>
+                    
+                    <div id="manualEntrySection">
+                        <div class="question-box">
+                            <div class="box-title">
+                                <i class="fas fa-question-circle"></i> Column Titles
+                            </div>
+                            <input type="text" class="form-control" id="columnTitles" placeholder="Enter column titles separated by commas (e.g., Question, Option A, Option B, Option C, Option D, Answer)" required>
+                            <small class="text-muted">For multiple correct answers, separate with slashes (e.g., A/B or A/B/C)</small>
+                        </div>
+                        
+                        <div class="answer-box">
+                            <div class="box-title">
+                                <i class="fas fa-list-ol"></i> Questions & Answers
+                            </div>
+                            <textarea class="form-control" id="mcqText" rows="8" placeholder="Enter each question on a new line, with columns separated by '|'. Example:&#10;What is 2+2? | 3 | 4 | 5 | 6 | B&#10;Capital of France? | London | Paris | Berlin | Madrid | B" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="fileUploadSection" style="display:none;">
+                        <div class="input-section">
+                            <div class="box-title">
+                                <i class="fas fa-file-upload"></i> Upload MCQ File
+                            </div>
+                            <input type="file" class="form-control" id="mcqFile" accept=".txt">
+                            <small class="text-muted">Upload a .txt file with each question on a new line, columns separated by '|'. First line should contain column titles.</small>
+                            
+                            <div class="mt-3">
+                                <div class="box-title">
+                                    <i class="fas fa-info-circle"></i> Example Format
+                                </div>
+                                <div class="example-box">
+                                    Question,Option A,Option B,Option C,Option D,Answer<br>
+                                    What is 2+2? | 3 | 4 | 5 | 6 | B<br>
+                                    Capital of France? | London | Paris | Berlin | Madrid | B<br>
+                                    Multiple answers? | Option1 | Option2 | Option3 | Option4 | A/B
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="codeSection" style="display:none;">
+                    <h3 class="section-title">Code Options</h3>
+                    
+                    <div class="input-section">
+                        <div class="input-section-title">
+                            <i class="fas fa-edit"></i> Input Method
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="codeManualEntry" name="codeInputType" value="manual" checked>
+                            <label class="form-check-label" for="codeManualEntry">Manual Entry</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="codeFileUpload" name="codeInputType" value="file">
+                            <label class="form-check-label" for="codeFileUpload">Upload File</label>
+                        </div>
+                    </div>
+                    
+                    <div id="codeManualEntrySection">
+                        <div class="question-box">
+                            <div class="box-title">
+                                <i class="fas fa-code"></i> Language Selection
+                            </div>
+                            <select class="form-select" id="codeLanguage">
+                                <option value="cpp">C++ (Dev-C++)</option>
+                                <option value="java">Java</option>
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="answer-box">
+                            <div class="box-title">
+                                <i class="fas fa-file-code"></i> Your Code
+                            </div>
+                            <textarea class="form-control" id="codeText" rows="15" placeholder="Paste your code here..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="codeFileUploadSection" style="display:none;">
+                        <div class="question-box">
+                            <div class="box-title">
+                                <i class="fas fa-code"></i> Language Selection
+                            </div>
+                            <select class="form-select" id="codeLanguageUpload">
+                                <option value="cpp">C++ (Dev-C++)</option>
+                                <option value="java">Java</option>
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="answer-box">
+                            <div class="box-title">
+                                <i class="fas fa-file-upload"></i> Upload Code File
+                            </div>
+                            <input type="file" class="form-control" id="codeFile" accept=".cpp,.c,.h,.java,.py,.js,.txt">
+                            <small class="text-muted">Supported formats: .cpp, .c, .h (for C++), .java, .py, .js, .txt</small>
+                            
+                            <div class="mt-3">
+                                <div class="box-title">
+                                    <i class="fas fa-info-circle"></i> Example C++ Code
+                                </div>
+                                <div class="example-box">
+                                    #include &lt;iostream&gt;<br>
+                                    using namespace std;<br><br>
+                                    int main() {<br>
+                                    &nbsp;&nbsp;int num;<br>
+                                    &nbsp;&nbsp;cout &lt;&lt; "Enter a number: ";<br>
+                                    &nbsp;&nbsp;cin &gt;&gt; num;<br><br>
+                                    &nbsp;&nbsp;if(num % 2 == 0) {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;cout &lt;&lt; num &lt;&lt; " is even.";<br>
+                                    &nbsp;&nbsp;} else {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;cout &lt;&lt; num &lt;&lt; " is odd.";<br>
+                                    &nbsp;&nbsp;}<br><br>
+                                    &nbsp;&nbsp;return 0;<br>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center mt-4 btn-group">
+                    <button type="button" class="btn btn-outline-secondary" id="backBtn">
+                        <i class="fas fa-arrow-left me-2"></i> Back
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i> Download File
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+    // Welcome screen elements
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const mainContent = document.getElementById("mainContent");
+    const startBtn = document.getElementById("startBtn");
+    const backBtn = document.getElementById("backBtn");
+    const exitBtn = document.getElementById("exitBtn");
+
+    // Main form elements
+    const inputType = document.getElementById("inputType");
+    const mcqSection = document.getElementById("mcqSection");
+    const codeSection = document.getElementById("codeSection");
+    const mainForm = document.getElementById("mainForm");
+    const manualEntrySection = document.getElementById("manualEntrySection");
+    const fileUploadSection = document.getElementById("fileUploadSection");
+    const mcqFile = document.getElementById("mcqFile");
+    const codeFile = document.getElementById("codeFile");
+    
+    // Code section elements
+    const codeManualEntrySection = document.getElementById("codeManualEntrySection");
+    const codeFileUploadSection = document.getElementById("codeFileUploadSection");
+
+    // Start button click handler
+    startBtn.addEventListener("click", () => {
+        welcomeScreen.style.display = "none";
+        mainContent.style.display = "block";
+    });
+
+    // Back button click handler
+    backBtn.addEventListener("click", () => {
+        mainContent.style.display = "none";
+        welcomeScreen.style.display = "flex";
+    });
+
+    // Exit button click handler
+    exitBtn.addEventListener("click", () => {
+        if(confirm("Are you sure you want to exit? Any unsaved work will be lost.")) {
+            mainContent.style.display = "none";
+            welcomeScreen.style.display = "flex";
+            // Reset form
+            mainForm.reset();
+            // Reset any other state if needed (like input fields visibility)
+            document.getElementById("manualEntry").checked = true;
+            document.getElementById("codeManualEntry").checked = true;
+            manualEntrySection.style.display = 'block';
+            fileUploadSection.style.display = 'none';
+            codeManualEntrySection.style.display = 'block';
+            codeFileUploadSection.style.display = 'none';
+            inputType.value = "mcq"; // Set default to MCQ
+            inputType.dispatchEvent(new Event("change")); // Trigger change to show MCQ section
+        }
+    });
+
+    // Toggle between manual entry and file upload for MCQs
+    document.querySelectorAll('input[name="mcqInputType"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if(this.value === 'manual') {
+                manualEntrySection.style.display = 'block';
+                fileUploadSection.style.display = 'none';
+                document.getElementById("columnTitles").required = true;
+                document.getElementById("mcqText").required = true;
+                mcqFile.required = false;
+            } else {
+                manualEntrySection.style.display = 'none';
+                fileUploadSection.style.display = 'block';
+                document.getElementById("columnTitles").required = false;
+                document.getElementById("mcqText").required = false;
+                mcqFile.required = true;
+            }
+        });
+    });
+
+    // Toggle between manual entry and file upload for Code
+    document.querySelectorAll('input[name="codeInputType"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if(this.value === 'manual') {
+                codeManualEntrySection.style.display = 'block';
+                codeFileUploadSection.style.display = 'none';
+                document.getElementById("codeText").required = true;
+                codeFile.required = false;
+            } else {
+                codeManualEntrySection.style.display = 'none';
+                codeFileUploadSection.style.display = 'block';
+                document.getElementById("codeText").required = false;
+                codeFile.required = true;
+            }
+        });
+    });
+
+    // Toggle between MCQ and Code sections
+    inputType.addEventListener("change", () => {
+        if (inputType.value === "mcq") {
+            mcqSection.style.display = "block";
+            codeSection.style.display = "none";
+            // Set required attributes for MCQ section based on current radio selection
+            document.querySelector('input[name="mcqInputType"]:checked').dispatchEvent(new Event('change'));
+        } else {
+            mcqSection.style.display = "none";
+            codeSection.style.display = "block";
+            // Trigger change event for code input type to set required attributes
+            document.querySelector('input[name="codeInputType"]:checked').dispatchEvent(new Event('change'));
+        }
+    });
+
+    mainForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if(inputType.value === "mcq") {
+            let titles, mcqRaw;
+            
+            if(document.querySelector('input[name="mcqInputType"]:checked').value === 'manual') {
+                // Manual entry
+                titles = document.getElementById("columnTitles").value.trim();
+                mcqRaw = document.getElementById("mcqText").value.trim();
+            } else {
+                // File upload
+                if(!mcqFile.files.length) {
+                    alert("Please select a file to upload.");
+                    return;
+                }
+                
+                try {
+                    const fileContent = await readFileAsText(mcqFile.files[0]);
+                    const lines = fileContent.split('\n');
+                    if (lines.length === 0) {
+                        alert("The uploaded file is empty.");
+                        return;
+                    }
+                    titles = lines[0].trim();
+                    mcqRaw = lines.slice(1).join('\n').trim();
+                    if (!titles) {
+                        alert("The first line (column titles) in the file is empty.");
+                        return;
+                    }
+                } catch(error) {
+                    alert("Error reading file: " + error.message);
+                    return;
+                }
+            }
+
+            if(!titles || !mcqRaw) {
+                alert("Please provide MCQ data.");
+                return;
+            }
+
+            const columns = titles.split(",").map(t => t.trim());
+            const rows = mcqRaw.split("\n").map(line => line.split("|").map(cell => cell.trim()));
+
+            // Create sheet data
+            let sheetData = [columns];
+            rows.forEach(row => {
+                // Fill missing cells with empty string if row shorter than columns
+                while(row.length < columns.length) row.push("");
+                sheetData.push(row.slice(0, columns.length));
+            });
+
+            // Generate workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+            // Auto-size columns based on content
+            const colWidths = [];
+            sheetData.forEach(row => {
+                row.forEach((cell, colIndex) => {
+                    // Calculate width based on content length
+                    const width = cell.toString().length;
+                    if (!colWidths[colIndex] || width > colWidths[colIndex]) {
+                        colWidths[colIndex] = width;
+                    }
+                });
+            });
+
+            // Apply column widths (add some padding)
+            ws['!cols'] = colWidths.map(width => ({ 
+                wch: Math.min(Math.max(width + 2, 10), 50) // Min width 10, max width 50, add 2 chars padding
+            }));
+
+            XLSX.utils.book_append_sheet(wb, ws, "MCQs");
+
+            // Export to XLSX
+            XLSX.writeFile(wb, "mcq_output.xlsx");
+            alert("MCQ file downloaded successfully!");
+
+        } else if(inputType.value === "code") {
+            let codeText, language;
+            
+            if(document.querySelector('input[name="codeInputType"]:checked').value === 'manual') {
+                // Manual entry
+                codeText = document.getElementById("codeText").value.trim();
+                language = document.getElementById("codeLanguage").value;
+            } else {
+                // File upload
+                if(!codeFile.files.length) {
+                    alert("Please select a file to upload.");
+                    return;
+                }
+                
+                try {
+                    codeText = await readFileAsText(codeFile.files[0]);
+                    language = document.getElementById("codeLanguageUpload").value;
+                } catch(error) {
+                    alert("Error reading file: " + error.message);
+                    return;
+                }
+            }
+            
+            if(!codeText) {
+                alert("Please enter or upload the code.");
+                return;
+            }
+
+            // Use jsPDF to create PDF and download
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                unit: "pt",
+                format: "a4"
+            });
+
+            const margin = 40;
+            const maxLineWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+            const fontSize = 10;
+            const lineHeight = 1.2; // Adjust for spacing between lines
+
+            doc.setFont("Space Mono", "normal"); // Use Space Mono for code
+            doc.setFontSize(fontSize);
+            doc.setTextColor("#d4d4d4"); // Light grey for code
+
+            // Add language info at the top
+            const languageText = language === "cpp" ? "C++ (Dev-C++)" : 
+                                 language === "java" ? "Java" :
+                                 language === "python" ? "Python" :
+                                 language === "javascript" ? "JavaScript" : "Other";
+            
+            doc.setFontSize(12); // Slightly larger for language
+            doc.setTextColor("#00FFFF"); // Cyan for language label
+            doc.text(`Language: ${languageText}`, margin, margin - 15);
+            doc.setFontSize(fontSize); // Reset to code font size
+            doc.setTextColor("#d4d4d4"); // Reset to code text color
+
+            // Split code by lines and add with word-wrap
+            let y = margin;
+            const lines = codeText.split('\n');
+
+            lines.forEach(line => {
+                const wrappedLines = doc.splitTextToSize(line, maxLineWidth);
+                wrappedLines.forEach(wrappedLine => {
+                    // Simple syntax highlighting (example for keywords)
+                    const keywords = ['int', 'void', 'cout', 'cin', 'if', 'else', 'for', 'while', 'class', 'public', 'private', 'static', 'return', 'import', 'function', 'const', 'let', 'var', 'def', 'print', 'System.out.println', 'console.log', '#include', 'using', 'namespace'];
+                    
+                    let xOffset = margin;
+                    let currentLine = wrappedLine;
+
+                    keywords.forEach(keyword => {
+                        const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
+                        currentLine = currentLine.replace(regex, `¤¤¤${keyword}¤¤¤`); // Use unique delimiter
+                    });
+
+                    const parts = currentLine.split('¤¤¤');
+
+                    parts.forEach(part => {
+                        if (keywords.includes(part)) {
+                            doc.setTextColor("#FFD700"); // Gold for keywords
+                            doc.text(part, xOffset, y);
+                            doc.setTextColor("#d4d4d4"); // Reset to default
+                        } else {
+                            doc.text(part, xOffset, y);
+                        }
+                        xOffset += doc.getStringUnitWidth(part) * fontSize;
+                    });
+                    
+                    y += fontSize * lineHeight;
+                    if (y > doc.internal.pageSize.getHeight() - margin) {
+                        doc.addPage();
+                        y = margin;
+                        doc.setFont("Space Mono", "normal");
+                        doc.setFontSize(fontSize);
+                        doc.setTextColor("#d4d4d4");
+                    }
+                });
+            });
+            
+            // Determine filename based on language
+            let filename = "code_output";
+            if(language === "cpp") filename = "program.cpp";
+            else if(language === "java") filename = "Program.java";
+            else if(language === "python") filename = "script.py";
+            else if(language === "javascript") filename = "script.js";
+            
+            doc.save(`${filename}.pdf`);
+            alert("Code PDF downloaded successfully!");
+        }
+    });
+
+    // Helper function to read file as text
+    function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = event => resolve(event.target.result);
+            reader.onerror = error => reject(error);
+            reader.readAsText(file);
+        });
+    }
+
+    // Trigger change event on page load to set correct section visible
+    inputType.dispatchEvent(new Event("change"));
+</script>
+
+</body>
+</html>
